@@ -1,0 +1,9 @@
+flowchart LR
+    B[Browser] -->|REST and same-origin UI| M[Monitor: REST and Kafka Streams]
+    M -->|Lifecycle commands| E[(Kafka location events)]
+    P[Single active poller] -->|Snapshots and failures| E
+    E -->|Process ordered location events| M
+    M -->|Committed lifecycle projection| R[(Kafka compacted registry)]
+    R -->|Active locations| P
+    P -->|Rate-limited HTTP| A[adsb.fi]
+    M --- V[(RocksDB views and changelogs)]

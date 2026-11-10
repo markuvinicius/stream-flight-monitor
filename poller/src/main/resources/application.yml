@@ -1,0 +1,35 @@
+server:
+  address: 0.0.0.0
+  port: 8080
+
+spring:
+  application:
+    name: flight-monitor-poller
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+poller:
+  upstream-polling-enabled: false
+  data-directory: ${POLLER_DATA_DIRECTORY:/var/lib/flight-poller}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  health:
+    kafka:
+      enabled: false
+  info:
+    env:
+      enabled: false
+
+info:
+  app:
+    name: Flight Monitor Poller
+    description: Poller skeleton; upstream requests are disabled.

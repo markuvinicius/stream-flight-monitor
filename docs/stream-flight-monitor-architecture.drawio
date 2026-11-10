@@ -1,0 +1,63 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="system-context" name="System Context">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="boundary" value="Local trusted environment" style="rounded=1;whiteSpace=wrap;fillColor=none;strokeColor=#b85450;dashed=1;verticalAlign=top;fontColor=#b85450;" vertex="1" parent="1"><mxGeometry x="40" y="100" width="650" height="330" as="geometry"/></mxCell>
+        <mxCell id="user" value="Local user" style="rounded=1;whiteSpace=wrap;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="70" y="220" width="130" height="80" as="geometry"/></mxCell>
+        <mxCell id="system" value="Flight Monitor&#xa;Current + 12-hour history" style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="360" y="200" width="240" height="120" as="geometry"/></mxCell>
+        <mxCell id="source" value="adsb.fi API&#xa;25 NM endpoint" style="shape=cloud;whiteSpace=wrap;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="850" y="200" width="210" height="120" as="geometry"/></mxCell>
+        <mxCell id="e1" value="Register / browse / delete" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" edge="1" parent="1" source="user" target="system"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" value="Global max 1 request/s&#xa;Aircraft response" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;startArrow=block;" edge="1" parent="1" source="system" target="source"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="components" name="Components">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="browser" value="Browser" style="rounded=1;whiteSpace=wrap;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="30" y="100" width="120" height="70" as="geometry"/></mxCell>
+        <mxCell id="monitor" value="Monitor&#xa;REST + UI + Streams" style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="240" y="80" width="210" height="100" as="geometry"/></mxCell>
+        <mxCell id="events" value="Kafka&#xa;Location events" style="shape=cylinder3;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="530" y="60" width="170" height="100" as="geometry"/></mxCell>
+        <mxCell id="registry" value="Kafka&#xa;Compacted registry" style="shape=cylinder3;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="530" y="280" width="170" height="100" as="geometry"/></mxCell>
+        <mxCell id="poller" value="Single active poller&#xa;Fair global scheduler" style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="820" y="180" width="230" height="100" as="geometry"/></mxCell>
+        <mxCell id="stores" value="Persistent views&#xa;History + regression" style="shape=cylinder3;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="240" y="360" width="210" height="100" as="geometry"/></mxCell>
+        <mxCell id="api" value="adsb.fi" style="shape=cloud;whiteSpace=wrap;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="840" y="470" width="180" height="100" as="geometry"/></mxCell>
+        <mxCell id="e1" value="REST / UI" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" edge="1" parent="1" source="browser" target="monitor"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" value="Lifecycle commands / process events" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;startArrow=block;" edge="1" parent="1" source="monitor" target="events"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" value="Snapshots / failures" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" edge="1" parent="1" source="poller" target="events"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="Committed lifecycle" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" edge="1" parent="1" source="monitor" target="registry"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" value="Active locations" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" edge="1" parent="1" source="registry" target="poller"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" value="Query / maintain state" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;startArrow=block;" edge="1" parent="1" source="monitor" target="stores"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" value="Limited HTTPS / response" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;startArrow=block;" edge="1" parent="1" source="poller" target="api"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="deployment" name="Deployment">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="host" value="Local host - whole stack below 8 GB; proposed envelope 6 GiB" style="rounded=1;fillColor=none;strokeColor=#b85450;dashed=1;verticalAlign=top;fontColor=#b85450;" vertex="1" parent="1"><mxGeometry x="20" y="20" width="1090" height="670" as="geometry"/></mxCell>
+        <mxCell id="net" value="Private Compose network" style="rounded=1;fillColor=none;strokeColor=#b85450;dashed=1;verticalAlign=top;" vertex="1" parent="1"><mxGeometry x="240" y="100" width="800" height="280" as="geometry"/></mxCell>
+        <mxCell id="browser" value="Browser" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="50" y="170" width="130" height="80" as="geometry"/></mxCell>
+        <mxCell id="monitor" value="Monitor&#xa;2 GiB limit" style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="280" y="170" width="170" height="90" as="geometry"/></mxCell>
+        <mxCell id="broker" value="Kafka KRaft&#xa;2 GiB limit" style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="550" y="170" width="170" height="90" as="geometry"/></mxCell>
+        <mxCell id="poller" value="Poller&#xa;512 MiB limit" style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="820" y="170" width="170" height="90" as="geometry"/></mxCell>
+        <mxCell id="state" value="Streams volume" style="shape=cylinder3;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="280" y="470" width="170" height="90" as="geometry"/></mxCell>
+        <mxCell id="data" value="Broker volume" style="shape=cylinder3;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="550" y="470" width="170" height="90" as="geometry"/></mxCell>
+        <mxCell id="lock" value="Checkpoint / lock volume" style="shape=cylinder3;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="820" y="470" width="190" height="90" as="geometry"/></mxCell>
+        <mxCell id="source" value="adsb.fi" style="shape=cloud;whiteSpace=wrap;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="820" y="720" width="180" height="90" as="geometry"/></mxCell>
+        <mxCell id="e1" value="Loopback HTTP" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" edge="1" parent="1" source="browser" target="monitor"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" value="Kafka protocol" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;startArrow=block;" edge="1" parent="1" source="monitor" target="broker"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" value="Kafka protocol" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;startArrow=block;" edge="1" parent="1" source="poller" target="broker"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="Persistent state" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" edge="1" parent="1" source="monitor" target="state"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" value="Persistent log" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" edge="1" parent="1" source="broker" target="data"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" value="Exclusive lock / checkpoint" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" edge="1" parent="1" source="poller" target="lock"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" value="Outbound HTTPS" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" edge="1" parent="1" source="poller" target="source"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

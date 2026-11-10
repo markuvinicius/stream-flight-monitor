@@ -1,0 +1,95 @@
+services:
+  broker:
+    image: apache/kafka:3.9.2@sha256:05b4616e0702ef2729327705d54ad6b50ea70b271c4b730fabd2320789fb7b02
+    hostname: broker
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_HEAP_OPTS: -Xms512m -Xmx768m
+    volumes:
+      - broker-data:/var/lib/kafka/data
+    networks:
+      - flight-net
+    mem_limit: 2g
+    healthcheck:
+      test: ["CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092"]
+      interval: 20s
+      timeout: 10s
+      retries: 6
+      start_period: 30s
+    restart: unless-stopped
+    stop_grace_period: 60s
+
+  monitor:
+    build:
+      context: .
+      dockerfile: monitor/Dockerfile
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: broker:9092
+      MONITOR_DATA_DIRECTORY: /var/lib/flight-monitor
+      MONITOR_UPSTREAM_POLLING_ENABLED: "false"
+      JAVA_TOOL_OPTIONS: -Xms256m -Xmx768m -XX:MaxDirectMemorySize=128m
+    volumes:
+      - monitor-data:/var/lib/flight-monitor
+    depends_on:
+      broker:
+        condition: service_healthy
+    networks:
+      - flight-net
+    ports:
+      - "127.0.0.1:8080:8080"
+    mem_limit: 2g
+    healthcheck:
+      test: ["CMD", "java", "-cp", "/app/healthcheck", "com.flightmonitor.monitor.HealthProbe"]
+      interval: 20s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  poller:
+    build:
+      context: .
+      dockerfile: poller/Dockerfile
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: broker:9092
+      POLLER_DATA_DIRECTORY: /var/lib/flight-poller
+      POLLER_UPSTREAM_POLLING_ENABLED: "false"
+      JAVA_TOOL_OPTIONS: -Xms64m -Xmx192m -XX:MaxDirectMemorySize=64m
+    volumes:
+      - poller-data:/var/lib/flight-poller
+    depends_on:
+      broker:
+        condition: service_healthy
+    networks:
+      - flight-net
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "java", "-cp", "/app/healthcheck", "com.flightmonitor.poller.HealthProbe"]
+      interval: 20s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+networks:
+  flight-net:
+    driver: bridge
+
+volumes:
+  broker-data:
+  monitor-data:
+  poller-data:

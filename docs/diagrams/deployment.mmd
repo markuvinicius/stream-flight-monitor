@@ -1,0 +1,16 @@
+flowchart TB
+    subgraph HOST[Local machine: whole stack below 8 GB]
+        B[Browser: one selected location per session]
+        subgraph NET[Private Compose network]
+            M[Monitor container: 2 GiB limit]
+            P[Poller container: 512 MiB limit]
+            K[Kafka KRaft container: 2 GiB limit]
+            M <--> K
+            P <--> K
+        end
+        B -->|Loopback HTTP| M
+        K --- D[(Persistent broker volume)]
+        M --- V[(Persistent Streams volume)]
+        P --- T[(Poller checkpoint and lock volume)]
+    end
+    P -->|Outbound HTTPS| A[adsb.fi]

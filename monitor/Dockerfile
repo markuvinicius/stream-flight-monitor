@@ -1,0 +1,20 @@
+FROM eclipse-temurin:21.0.13_9-jdk-jammy@sha256:4b1a74fbffbe6b4e7b6f0171a472478282fb463790a51edf10e465d578f22b69 AS build
+WORKDIR /workspace
+COPY .mvn/ .mvn/
+COPY mvnw pom.xml ./
+COPY monitor/pom.xml monitor/pom.xml
+COPY poller/pom.xml poller/pom.xml
+COPY monitor/src monitor/src
+RUN sh ./mvnw -B -pl monitor -am -DskipTests package
+
+FROM eclipse-temurin:21.0.13_9-jre-jammy@sha256:1eac8b8fee11ca7d6725a48bc5d41992ed1561504ebae25490d2d062847e8269
+WORKDIR /app
+RUN mkdir -p /var/lib/flight-monitor /app/healthcheck
+COPY --from=build /workspace/monitor/target/monitor.jar /app/monitor.jar
+COPY --from=build /workspace/monitor/target/classes/com/flightmonitor/monitor/HealthProbe.class /app/healthcheck/com/flightmonitor/monitor/HealthProbe.class
+RUN chown -R 10001:10001 /var/lib/flight-monitor /app
+USER 10001:10001
+ENV JAVA_TOOL_OPTIONS="-Xms256m -Xmx768m -XX:MaxDirectMemorySize=128m"
+EXPOSE 8080
+HEALTHCHECK --interval=20s --timeout=3s --start-period=40s --retries=3 CMD ["java", "-cp", "/app/healthcheck", "com.flightmonitor.monitor.HealthProbe"]
+ENTRYPOINT ["java", "-jar", "/app/monitor.jar"]

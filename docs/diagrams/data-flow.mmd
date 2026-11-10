@@ -1,0 +1,13 @@
+flowchart TD
+    C[Validate coordinates] --> L[Append registration event]
+    L --> R[Commit active registry projection]
+    R --> Q[Fair poll rotation]
+    Q --> H[Fetch exact 25 NM endpoint]
+    H --> S[Append snapshot or failure event]
+    S --> G{Location still active?}
+    G -->|Yes| W[Update membership, history and regression]
+    G -->|No| X[Reject late result and schedule cleanup]
+    W --> U[Serve current and historical snapshots]
+    D[Append deletion event] --> Z[Commit deleted registry state]
+    Z --> F[Close access and remove from rotation]
+    Z --> X

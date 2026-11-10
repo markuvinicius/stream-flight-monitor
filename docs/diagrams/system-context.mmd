@@ -1,0 +1,5 @@
+flowchart LR
+    U[Local user] -->|Register, browse, delete| S[Flight Monitor]
+    S -->|Global maximum 1 request per second| A[adsb.fi public API]
+    A -->|Aircraft within 25 NM| S
+    S -->|Current flights and 12-hour history| U
