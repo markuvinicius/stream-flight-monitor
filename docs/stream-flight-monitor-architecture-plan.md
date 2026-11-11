@@ -396,7 +396,7 @@ These are proposed files, not existing code links. Exact class boundaries can be
 | `poller/src/main/java/.../schedule/` | Rotation, exclusive ownership, limiter, checkpoints and cooldowns |
 | `poller/src/main/java/.../source/` | Bounded HTTPS client and validated upstream normalization |
 | Both applications' configuration files | Typed properties, local profiles, resource limits and log categories |
-| `compose.yaml`, container build files | One broker, two services, volumes, private network and memory limits |
+| `../docker-compose.yaml`, container build files | One broker, two services, volumes, private network and memory limits |
 | Module test directories and `integration-tests/` | Unit, topology, real Kafka/HTTP integration, UI flow and resource validation |
 | `README.md`, `CHANGELOG.md` | Setup, contracts, recovery/deletion instructions and release record |
 
