@@ -1,0 +1,29 @@
+meta {
+  name: Reject registration without the local mutation header
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{base_url}}/api/locations
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: missing-mutation-header
+}
+
+body:json {
+  {
+    "latitude": 0,
+    "longitude": 0
+  }
+}
+
+tests {
+  test("rejects a mutation without X-Flight-Monitor", function() {
+    expect(res.status).to.equal(403);
+    expect(res.body.code).to.equal("MUTATION_HEADER_REQUIRED");
+  });
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Delete the opposite-boundary test location
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{base_url}}/api/locations/{{boundaryLocationId}}
+  body: none
+}
+
+headers {
+  X-Flight-Monitor: 1
+}
+
+tests {
+  test("deletes the temporary boundary registration", function() {
+    expect(res.status).to.equal(202);
+    expect(res.body.locationId).to.equal(bru.getVar("boundaryLocationId"));
+    expect(res.body.cleanupPending).to.equal(true);
+  });
+}

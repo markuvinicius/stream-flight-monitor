@@ -1,0 +1,30 @@
+meta {
+  name: Reject longitude below -180
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{base_url}}/api/locations
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: validation-longitude-below-range
+  X-Flight-Monitor: 1
+}
+
+body:json {
+  {
+    "latitude": 0,
+    "longitude": -180.0001
+  }
+}
+
+tests {
+  test("rejects longitude outside the valid range", function() {
+    expect(res.status).to.equal(400);
+    expect(res.body.code).to.equal("INVALID_COORDINATES");
+  });
+}

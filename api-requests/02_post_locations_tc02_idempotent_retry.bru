@@ -1,0 +1,31 @@
+meta {
+  name: Retry registration with the same key and coordinates
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/locations
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: {{idempotencyKey}}
+  X-Flight-Monitor: 1
+}
+
+body:json {
+  {
+    "latitude": 90,
+    "longitude": -180
+  }
+}
+
+tests {
+  test("returns the same registration for an idempotent retry", function() {
+    expect(res.status).to.equal(201);
+    expect(res.body.locationId).to.equal(bru.getVar("locationId"));
+    expect(res.body.operationId).to.equal(bru.getVar("operationId"));
+  });
+}

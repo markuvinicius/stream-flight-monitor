@@ -1,0 +1,23 @@
+meta {
+  name: Get the committed registration operation
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{base_url}}/api/operations/{{operationId}}
+  body: none
+}
+
+tests {
+  test("returns the committed registration result", function() {
+    expect(res.status).to.equal(200);
+    expect(res.headers["content-type"]).to.include("application/json");
+    expect(res.body.operationId).to.equal(bru.getVar("operationId"));
+    expect(res.body.eventId).to.be.a("string");
+    expect(res.body.locationId).to.equal(bru.getVar("locationId"));
+    expect(res.body.httpStatus).to.equal(201);
+    expect(res.body.code).to.equal("WAITING_FOR_FIRST_POLL");
+    expect(res.body.expiresAt).to.be.a("string");
+  });
+}

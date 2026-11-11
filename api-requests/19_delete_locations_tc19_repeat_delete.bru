@@ -1,0 +1,22 @@
+meta {
+  name: Repeat deletion of the same location
+  type: http
+  seq: 19
+}
+
+delete {
+  url: {{base_url}}/api/locations/{{locationId}}
+  body: none
+}
+
+headers {
+  X-Flight-Monitor: 1
+}
+
+tests {
+  test("treats a repeated deletion as idempotent", function() {
+    expect(res.status).to.equal(202);
+    expect(res.body.locationId).to.equal(bru.getVar("locationId"));
+    expect(res.body.cleanupPending).to.equal(true);
+  });
+}

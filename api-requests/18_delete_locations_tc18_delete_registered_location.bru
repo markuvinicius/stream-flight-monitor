@@ -1,0 +1,24 @@
+meta {
+  name: Delete the registered location
+  type: http
+  seq: 18
+}
+
+delete {
+  url: {{base_url}}/api/locations/{{locationId}}
+  body: none
+}
+
+headers {
+  X-Flight-Monitor: 1
+}
+
+tests {
+  test("returns only after committed deletion", function() {
+    expect(res.status).to.equal(202);
+    expect(res.headers["content-type"]).to.include("application/json");
+    expect(res.body.locationId).to.equal(bru.getVar("locationId"));
+    expect(res.body.operationId).to.match(/^[a-f0-9]{64}$/);
+    expect(res.body.cleanupPending).to.equal(true);
+  });
+}

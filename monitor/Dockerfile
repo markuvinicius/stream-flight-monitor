@@ -2,6 +2,8 @@ FROM eclipse-temurin:21.0.13_9-jdk-jammy@sha256:4b1a74fbffbe6b4e7b6f0171a4724782
 WORKDIR /workspace
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
+COPY contracts/pom.xml contracts/pom.xml
+COPY contracts/src contracts/src
 COPY monitor/pom.xml monitor/pom.xml
 COPY poller/pom.xml poller/pom.xml
 COPY monitor/src monitor/src

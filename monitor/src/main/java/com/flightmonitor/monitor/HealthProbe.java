@@ -4,7 +4,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 
 /**
- * Small dependency-free Docker health check for the monitor actuator endpoint.
+ * Small dependency-free Docker readiness check for the monitor actuator endpoint.
  */
 public final class HealthProbe {
     private HealthProbe() {
@@ -12,7 +12,7 @@ public final class HealthProbe {
 
     public static void main(String[] args) throws Exception {
         HttpURLConnection connection =
-                (HttpURLConnection) URI.create("http://127.0.0.1:8080/actuator/health")
+                (HttpURLConnection) URI.create("http://127.0.0.1:8080/actuator/health/readiness")
                         .toURL()
                         .openConnection();
         connection.setConnectTimeout(1_500);

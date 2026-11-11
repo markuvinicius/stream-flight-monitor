@@ -1,0 +1,29 @@
+meta {
+  name: Reject registration without latitude
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{base_url}}/api/locations
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: validation-missing-latitude
+  X-Flight-Monitor: 1
+}
+
+body:json {
+  {
+    "longitude": 0
+  }
+}
+
+tests {
+  test("rejects a missing coordinate", function() {
+    expect(res.status).to.equal(400);
+    expect(res.headers["content-type"]).to.include("application/problem+json");
+  });
+}

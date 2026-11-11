@@ -1,0 +1,13 @@
+{
+  "version": "1",
+  "name": "Stream Flight Monitor API Tests",
+  "uid": "9bb275d3-914a-42d2-bfbd-9870e4b780db",
+  "root": "root",
+  "docs": "",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "preserveCookies": true
+}

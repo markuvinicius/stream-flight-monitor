@@ -1,0 +1,18 @@
+meta {
+  name: Reject a malformed operation ID
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{base_url}}/api/operations/not-an-operation-id
+  body: none
+}
+
+tests {
+  test("rejects a malformed operation ID", function() {
+    expect(res.status).to.equal(400);
+    expect(res.headers["content-type"]).to.include("application/problem+json");
+    expect(res.body.code).to.equal("INVALID_ID");
+  });
+}

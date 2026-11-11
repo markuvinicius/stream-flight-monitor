@@ -1,0 +1,42 @@
+meta {
+  name: Register location at opposite coordinate boundary
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/api/locations
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+  X-Flight-Monitor: 1
+}
+
+body:json {
+  {
+    "latitude": -90,
+    "longitude": 180
+  }
+}
+
+script:pre-request {
+  const key = `flight-monitor-boundary-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  bru.setVar("boundaryIdempotencyKey", key);
+  req.setHeader("Idempotency-Key", key);
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("boundaryLocationId", res.body.locationId);
+  }
+}
+
+tests {
+  test("accepts the opposite valid coordinate boundaries", function() {
+    expect(res.status).to.equal(201);
+    expect(res.body.locationId).to.match(/^[a-f0-9]{64}$/);
+    expect(res.body.state).to.equal("WAITING_FOR_FIRST_POLL");
+  });
+}

@@ -1,0 +1,31 @@
+meta {
+  name: Reject cross-origin registration
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{base_url}}/api/locations
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: cross-origin-registration
+  X-Flight-Monitor: 1
+  Origin: https://attacker.example
+}
+
+body:json {
+  {
+    "latitude": 0,
+    "longitude": 0
+  }
+}
+
+tests {
+  test("rejects a cross-origin mutation", function() {
+    expect(res.status).to.equal(403);
+    expect(res.body.code).to.equal("CROSS_ORIGIN_DENIED");
+  });
+}

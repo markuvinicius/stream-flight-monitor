@@ -38,8 +38,11 @@ services:
       context: .
       dockerfile: monitor/Dockerfile
     environment:
+      SPRING_PROFILES_ACTIVE: local
       KAFKA_BOOTSTRAP_SERVERS: broker:9092
       MONITOR_DATA_DIRECTORY: /var/lib/flight-monitor
+      MONITOR_BIND_ADDRESS: 0.0.0.0
+      MONITOR_PUBLIC_ORIGIN: http://127.0.0.1:8080
       MONITOR_UPSTREAM_POLLING_ENABLED: "false"
       JAVA_TOOL_OPTIONS: -Xms256m -Xmx768m -XX:MaxDirectMemorySize=128m
     volumes:
@@ -72,7 +75,7 @@ services:
     volumes:
       - poller-data:/var/lib/flight-poller
     depends_on:
-      broker:
+      monitor:
         condition: service_healthy
     networks:
       - flight-net

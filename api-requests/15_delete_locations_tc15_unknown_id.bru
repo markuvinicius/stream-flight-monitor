@@ -1,0 +1,22 @@
+meta {
+  name: Return not found when deleting an unknown location
+  type: http
+  seq: 15
+}
+
+delete {
+  url: {{base_url}}/api/locations/{{unknownId}}
+  body: none
+}
+
+headers {
+  X-Flight-Monitor: 1
+}
+
+tests {
+  test("returns a structured not-found problem", function() {
+    expect(res.status).to.equal(404);
+    expect(res.headers["content-type"]).to.include("application/problem+json");
+    expect(res.body.code).to.equal("LOCATION_NOT_FOUND");
+  });
+}

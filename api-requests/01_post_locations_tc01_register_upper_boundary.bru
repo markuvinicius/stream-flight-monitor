@@ -1,0 +1,47 @@
+meta {
+  name: Register location at upper coordinate boundary
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/locations
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+  X-Flight-Monitor: 1
+}
+
+body:json {
+  {
+    "latitude": 90,
+    "longitude": -180
+  }
+}
+
+script:pre-request {
+  const key = `flight-monitor-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  bru.setVar("idempotencyKey", key);
+  req.setHeader("Idempotency-Key", key);
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("locationId", res.body.locationId);
+    bru.setVar("operationId", res.body.operationId);
+  }
+}
+
+tests {
+  test("returns 201 with a location receipt", function() {
+    expect(res.status).to.equal(201);
+    expect(res.headers["content-type"]).to.include("application/json");
+    expect(res.body.locationId).to.match(/^[a-f0-9]{64}$/);
+    expect(res.body.operationId).to.match(/^[a-f0-9]{64}$/);
+    expect(res.body.trackingUrl).to.equal(`/locations/${res.body.locationId}`);
+    expect(res.body.state).to.equal("WAITING_FOR_FIRST_POLL");
+    expect(res.headers.location).to.include(res.body.locationId);
+  });
+}

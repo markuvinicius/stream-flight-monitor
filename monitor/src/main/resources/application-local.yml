@@ -1,0 +1,12 @@
+monitor:
+  lifecycle:
+    enabled: true
+  kafka:
+    topic-bootstrap-enabled: true
+
+management:
+  endpoint:
+    health:
+      group:
+        readiness:
+          include: readinessState,lifecycle

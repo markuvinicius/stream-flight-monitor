@@ -1,0 +1,22 @@
+meta {
+  name: Reject a malformed location ID
+  type: http
+  seq: 16
+}
+
+delete {
+  url: {{base_url}}/api/locations/not-a-location-id
+  body: none
+}
+
+headers {
+  X-Flight-Monitor: 1
+}
+
+tests {
+  test("rejects a malformed location ID", function() {
+    expect(res.status).to.equal(400);
+    expect(res.headers["content-type"]).to.include("application/problem+json");
+    expect(res.body.code).to.equal("INVALID_ID");
+  });
+}

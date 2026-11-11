@@ -1,0 +1,31 @@
+meta {
+  name: Reject changed coordinates for a reused idempotency key
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/api/locations
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: {{idempotencyKey}}
+  X-Flight-Monitor: 1
+}
+
+body:json {
+  {
+    "latitude": 89,
+    "longitude": -180
+  }
+}
+
+tests {
+  test("returns an idempotency conflict", function() {
+    expect(res.status).to.equal(409);
+    expect(res.headers["content-type"]).to.include("application/problem+json");
+    expect(res.body.code).to.equal("IDEMPOTENCY_CONFLICT");
+  });
+}

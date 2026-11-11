@@ -1,0 +1,30 @@
+meta {
+  name: Reject latitude above 90
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{base_url}}/api/locations
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+  Idempotency-Key: validation-latitude-above-range
+  X-Flight-Monitor: 1
+}
+
+body:json {
+  {
+    "latitude": 90.0001,
+    "longitude": 0
+  }
+}
+
+tests {
+  test("rejects latitude outside the valid range", function() {
+    expect(res.status).to.equal(400);
+    expect(res.body.code).to.equal("INVALID_COORDINATES");
+  });
+}

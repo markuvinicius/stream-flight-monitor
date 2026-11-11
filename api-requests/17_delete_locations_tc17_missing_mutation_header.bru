@@ -1,0 +1,17 @@
+meta {
+  name: Reject deletion without the local mutation header
+  type: http
+  seq: 17
+}
+
+delete {
+  url: {{base_url}}/api/locations/{{locationId}}
+  body: none
+}
+
+tests {
+  test("rejects a deletion without X-Flight-Monitor", function() {
+    expect(res.status).to.equal(403);
+    expect(res.body.code).to.equal("MUTATION_HEADER_REQUIRED");
+  });
+}

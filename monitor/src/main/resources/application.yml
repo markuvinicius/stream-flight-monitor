@@ -1,16 +1,37 @@
 server:
-  address: 0.0.0.0
+  address: ${MONITOR_BIND_ADDRESS:127.0.0.1}
   port: 8080
+  max-http-request-header-size: 8KB
+  tomcat:
+    max-connections: 64
+    accept-count: 16
+    connection-timeout: 5s
+    threads:
+      max: 32
+      min-spare: 2
 
 spring:
   application:
     name: flight-monitor
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  jackson:
+    parser:
+      strict-duplicate-detection: true
 
 monitor:
+  lifecycle:
+    enabled: false
+    namespace: ${MONITOR_DEPLOYMENT_NAMESPACE:flight-local-v1}
+    application-id: flight-monitor-lifecycle-v1
+    public-origin: ${MONITOR_PUBLIC_ORIGIN:http://127.0.0.1:8080}
+    max-active: 1000
+    max-lifetime: 10000
+    max-operations-per-location: 16
   upstream-polling-enabled: false
   data-directory: ${MONITOR_DATA_DIRECTORY:/var/lib/flight-monitor}
+  kafka:
+    topic-bootstrap-enabled: false
 
 management:
   endpoints:
@@ -31,4 +52,4 @@ management:
 info:
   app:
     name: Flight Monitor
-    description: Local monitor skeleton; feature processing is not enabled.
+    description: Local lifecycle monitor; aircraft polling and history are not enabled.

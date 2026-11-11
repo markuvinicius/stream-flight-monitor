@@ -1,0 +1,18 @@
+meta {
+  name: Return not found for an unknown operation
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{base_url}}/api/operations/{{unknownId}}
+  body: none
+}
+
+tests {
+  test("returns a structured not-found problem", function() {
+    expect(res.status).to.equal(404);
+    expect(res.headers["content-type"]).to.include("application/problem+json");
+    expect(res.body.code).to.equal("OPERATION_NOT_FOUND");
+  });
+}
